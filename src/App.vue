@@ -213,7 +213,7 @@ export default {
         ]
       },
       { icon: "settings", text: "Settings" },
-      { icon: "help", text: "Help" }
+     
     ]
   }),
   props: {
