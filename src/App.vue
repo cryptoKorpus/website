@@ -4,8 +4,7 @@
       fixed
       :clipped="$vuetify.breakpoint.lgAndUp"
       app
-      v-model="drawer"
-    >
+      v-model="drawer">
       <v-list dense>
         <template v-for="item in items">
           <v-layout
@@ -40,7 +39,7 @@
             <v-list-tile
               v-for="(child, i) in item.children"
               :key="i"
-              @click="teste"
+              @keyup="teste"
             >
               <v-list-tile-action v-if="child.icon">
                 <v-icon>{{ child.icon }}</v-icon>
@@ -82,6 +81,7 @@
         prepend-icon="search"
         label="Search"
         class="hidden-sm-and-down"
+        v-model="filterText"
       ></v-text-field>
       <v-spacer></v-spacer>
       <v-btn icon>
@@ -89,7 +89,20 @@
       </v-btn>
     </v-toolbar>
     <v-content>
-
+ <v-list two-line>
+          <template v-for="(item, index) in getEmails()">
+            <v-subheader v-if="item.header" :key="item.header">{{ item.header }}</v-subheader>
+            <v-divider v-else-if="item.divider" :inset="item.inset" :key="index"></v-divider>
+            <v-list-tile avatar v-else :key="item.title" @click="teste">
+            <v-avatar>
+              <v-icon>{{item.avatar}}</v-icon></v-avatar>
+              <v-list-tile-content>
+                <v-list-tile-title v-html="item.title"></v-list-tile-title>
+                <v-list-tile-sub-title v-html="item.subtitle"></v-list-tile-sub-title>
+              </v-list-tile-content>
+            </v-list-tile>
+          </template>
+        </v-list>
     </v-content>
     <v-btn
       fab
@@ -170,15 +183,34 @@
 
 <script>
 export default {
-  methods: {
-      teste() {
-        alert("todo");
-      }
-    },
   data: () => ({
-    
+    filterText: null,
     dialog: false,
     drawer: null,
+    originalEmails: null,
+    emails: [
+      { header: "Today" },
+      {
+        avatar: "person",
+        title: "Brunch this weekend?",
+        subtitle:
+          "<span class='text--primary'>Ali Connors</span> &mdash; I'll be in your neighborhood doing errands this weekend. Do you want to hang out?"
+      },
+      { divider: true, inset: true },
+      {
+        avatar: "person",
+        title: 'Summer BBQ <span class="grey--text text--lighten-1">4</span>',
+        subtitle:
+          "<span class='text--primary'>to Alex, Scott, Jennifer</span> &mdash; Wish I could come, but I'm out of town this weekend."
+      },
+      { divider: true, inset: true },
+      {
+        avatar: "person",
+        title: "Oui oui",
+        subtitle:
+          "<span class='text--primary'>Sandra Adams</span> &mdash; Do you have Paris recommendations? Have you ever been?"
+      }
+    ],
     items: [
       { icon: "email", text: "Inbox" },
       { icon: "mail_outline", text: "Sent Email" },
@@ -195,18 +227,35 @@ export default {
         "icon-alt": "keyboard_arrow_down",
         text: "More",
         model: false,
-        children: [
-          { text: "Import" },
-          { text: "Export" },
-          { text: "Print" },
-        ]
+        children: [{ text: "Import" }, { text: "Export" }, { text: "Print" }]
       },
-      { icon: "settings", text: "Settings" },
-     
+      { icon: "settings", text: "Settings" }
     ]
   }),
   props: {
     source: String
+  },
+  methods: {
+    getEmails() {
+      if (!this.filterText || this.filterText.length < 3) {
+        return this.emails;
+      } else {
+        var searchTxt = this.filterText;
+        var filtered = this.emails.filter(mail => {
+          if (!mail.title) 
+          return false;
+          return mail.title
+            .toString()
+            .toLowerCase()
+            .includes(searchTxt.toLowerCase());
+        });
+        return filtered;
+      }
+    },
+
+    teste() {
+      alert("todo");
+    }
   }
 };
 </script>
